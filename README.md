@@ -18,6 +18,6 @@ Eris is a GPT4 bot for discord servers that I created that has the background fr
     -create an assistant 
     -copy and paste the contents from eris.txt and paste the contents into the GPT's Instructions. 
     -copy the assistant ID and enter it in bot py's line 12 where it asks for assistant_id
-# Discord 
+## Discord 
     -create a discord bot, there is a guide here: https://discordpy.readthedocs.io/en/stable/discord.html
     -obtain the discord bot token and place it on line 102 DiscordClient.run("YOUR TOKEN HERE")
