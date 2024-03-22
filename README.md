@@ -17,11 +17,11 @@ So long as you invoke her name in a discord chat she will respond.
 
 examples:
 
-"Eris flip a coin to determine if I go out tonight."
+    "Eris flip a coin to determine if I go out tonight."
 
-"How can I make guacamole, Eris?"
+    "How can I make guacamole, Eris?"
 
-"how can eris know some lore about her own show?"
+    "how can eris know some lore about her own show?"
 
 # Installation
 
