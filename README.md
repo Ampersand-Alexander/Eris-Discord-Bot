@@ -15,7 +15,7 @@ Eris is a GPT4 bot for discord servers that I created that has the background fr
 
 So long as you invoke her name in a discord chat she will respond. 
 
-examples:
+Examples:
 
     "Eris flip a coin to determine if I go out tonight."
 
