@@ -4,7 +4,7 @@ import json
 import time
 import discord
 import random
-
+import re
 
 intents = discord.Intents.all()
 DiscordClient = discord.Client(command_prefix="!", intents=intents)
@@ -42,7 +42,9 @@ def wait_on_run(run, thread):
 # show_json(client)
 # print(f'EnvironmentVar: {os.environ.get("OPENAI_API_KEY", "<your OpenAI API key if not set as env var>")}')
 
-def submit_message(assistant_id, thread, user_message):
+def submit_message(assistant_id, thread, user_message, history):
+    history.append({"role": "user", "content": user_message})
+    
     client.beta.threads.messages.create(
         thread_id=thread.id, role="user", content=user_message
     )
@@ -63,6 +65,14 @@ def create_thread_and_run(user_input):
 @DiscordClient.event
 async def on_ready():
     print("We have logged in as {0.user}".format(DiscordClient))
+    
+message_history = []
+
+def check_eris_name(text):
+    word = r'\b' + re.escape("eris") + r'\b'
+    if re.search(word, text):
+        return True
+    return False
 
 @DiscordClient.event
 async def on_message(message):
@@ -71,28 +81,40 @@ async def on_message(message):
     if message.author == DiscordClient.user:
         return
     
-    if "eris" in message.content.lower():
-        # Generate a random number between 1 and 10 (inclusive)
-        # if random.randint(1, 10) == 1:
-        # userInput = input("")
+    if check_eris_name(message.content.lower()):
+        message_history.append({"role": "user", "content": message.content})
+
+        # Create the thread and run the assistant
         thread, run = create_thread_and_run(message.content)
+        run = submit_message(assistant_id, thread, message.content, message_history)
         run = wait_on_run(run, thread)
 
-        jsonresponse =(get_response(thread))
-        await message.channel.send(get_most_recent_gpt_response(jsonresponse))
-    elif random.randint(1, 10) == 1 and "?" in message.content.lower():
-        thread, run = create_thread_and_run(message.content)
-        run = wait_on_run(run, thread)
+        # Get the response from the assistant
+        jsonresponse = get_response(thread)
+        assistant_response = get_most_recent_gpt_response(jsonresponse)
 
-        jsonresponse =(get_response(thread))
-        await message.channel.send(get_most_recent_gpt_response(jsonresponse))
+        # Add the assistant's response to the history
+        message_history.append({"role": "assistant", "content": assistant_response})
 
-    elif random.randint(1, 10) == 1:
-        thread, run = create_thread_and_run(message.content)
-        run = wait_on_run(run, thread)
+        # Trim the message history to the last 50 messages
+        if len(message_history) > 50:
+            message_history = message_history[-50:]
 
-        jsonresponse =(get_response(thread))
-        await message.channel.send(get_most_recent_gpt_response(jsonresponse))
+        # Send the assistant's response
+        await message.channel.send(assistant_response)
+    # elif random.randint(1, 10) == 1 and "?" in message.content.lower():
+    #     thread, run = create_thread_and_run(message.content)
+    #     run = wait_on_run(run, thread)
+
+    #     jsonresponse =(get_response(thread))
+    #     await message.channel.send(get_most_recent_gpt_response(jsonresponse))
+
+    # elif random.randint(1, 10) == 1:
+    #     thread, run = create_thread_and_run(message.content)
+    #     run = wait_on_run(run, thread)
+
+    #     jsonresponse =(get_response(thread))
+    #     await message.channel.send(get_most_recent_gpt_response(jsonresponse))
 
 @DiscordClient.event
 async def on_guild_join(guild):
